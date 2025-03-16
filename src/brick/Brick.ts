@@ -1,28 +1,48 @@
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, Subscription } from "rxjs";
+import { BrickDirectory } from "./BrickDirectory";
+import { BrickInternalData } from "./types/Types";
 
-export type BrickInternalData<T,E=string> = {
-    data: T;
-    error: E | null;
-    isLoading: boolean;
-}
+
+const brickDirectory = {};
 
 export class Brick<T, E=string> {
 
     private subject: BehaviorSubject<BrickInternalData<T,E>>;
+    private instance = BrickDirectory.getInstance();
 
-    constructor(initialData: T) {
+    constructor(name: string, initialData: T) {
         this.subject = new BehaviorSubject({
             data: initialData,
             error: null,
             isLoading: false
         } as BrickInternalData<T,E>);
+        // register in brick directory
+        // todo: better way to handle this
+        this.instance.registerBrick(name, this as unknown as Brick<any, string>);
     }
 
-    public setData(data: T): void {
-        this.subject.next({
-            ...this.subject.value,
-            data
-        });
+    public static createBrick<T, E=string>(name: string, initialData: T): Brick<T, E> {
+        const brick = new Brick<T, E>(name, initialData);
+
+        return brick;
+    }
+
+    public setData(data: T): void;
+    public setData(updateFn: (current: T) => T): void;
+
+    public setData(arg1: T | ((current: T)=> T)): void {
+        if(arg1 instanceof Object) {
+            this.subject.next({
+                ...this.subject.value,
+                data: arg1 as T
+            });
+        }
+        if(arg1 instanceof Function) {
+            this.subject.next( {
+                ...this.subject.value,
+                data: arg1(this.subject.value.data)
+            });
+        }
     }
 
     public setError(error: E): void {
@@ -64,10 +84,13 @@ export class Brick<T, E=string> {
         );
     }
 
-    public getSelector$<S>(selector: (source: T) => S): Observable<S> {
+    public select$<S>(
+        selector: (source: T) => S,
+        comparator?: (source: S) => boolean
+    ): Observable<S> {
         return this.subject.pipe(
             map( value => selector(value.data)),
-            distinctUntilChanged(),
+            distinctUntilChanged(comparator),
         );
     }
 
@@ -82,9 +105,9 @@ export class Brick<T, E=string> {
     public registerSideEffect(
         changeFn: (state: T) => boolean,
         effect: (value: T) => any
-    ): void {
+    ): Subscription {
         // write cleanup
-        this.data$.pipe(
+        return this.data$.pipe(
             filter(changeFn)
         ).subscribe(value => effect(value))
     }
@@ -92,4 +115,8 @@ export class Brick<T, E=string> {
     // prevent memory leaks 
     // way to register middleware - side effects -done
     // combine few bricks
+
+    public get snapshot(): T {
+        return this.subject.value.data;
+    }
 }
