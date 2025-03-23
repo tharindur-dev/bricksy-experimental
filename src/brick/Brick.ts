@@ -1,4 +1,7 @@
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, Subscription } from "rxjs";
+import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
+import { distinctUntilChanged } from "rxjs/internal/operators/distinctUntilChanged";
+import { map } from "rxjs/internal/operators/map";
+import { Observable } from "rxjs/internal/Observable";
 import { BrickDirectory } from "./BrickDirectory";
 import { BrickInternalData } from "./types/Types";
 
@@ -9,6 +12,8 @@ export class Brick<T, E=string> {
 
     private subject: BehaviorSubject<BrickInternalData<T,E>>;
     private instance = BrickDirectory.getInstance();
+    private actions = new Map<string, (state: T, payload: any) => T>();
+    private sideEffects = new Map<string, (args: any) => any>();
 
     constructor(name: string, initialData: T) {
         this.subject = new BehaviorSubject({
@@ -31,18 +36,20 @@ export class Brick<T, E=string> {
     public setData(updateFn: (current: T) => T): void;
 
     public setData(arg1: T | ((current: T)=> T)): void {
+        if(arg1 instanceof Function) {
+            this.subject.next( {
+                ...this.subject.value,
+                data: arg1(this.subject.value.data)
+            });
+            return;
+        }
         if(arg1 instanceof Object) {
             this.subject.next({
                 ...this.subject.value,
                 data: arg1 as T
             });
         }
-        if(arg1 instanceof Function) {
-            this.subject.next( {
-                ...this.subject.value,
-                data: arg1(this.subject.value.data)
-            });
-        }
+
     }
 
     public setError(error: E): void {
@@ -84,10 +91,17 @@ export class Brick<T, E=string> {
         );
     }
 
+    public select$(): Observable<T>;
+    public select$<S>(selector?: (source: T) => S): Observable<S>;
     public select$<S>(
-        selector: (source: T) => S,
+        selector?: (source: T) => S,
         comparator?: (source: S) => boolean
     ): Observable<S> {
+
+        if(!selector){
+            return this.data$ as unknown as Observable<S>; 
+        } 
+
         return this.subject.pipe(
             map( value => selector(value.data)),
             distinctUntilChanged(comparator),
@@ -102,21 +116,34 @@ export class Brick<T, E=string> {
         this.setData({...this.subject.value.data, ...partial});
     }
 
-    public registerSideEffect(
-        changeFn: (state: T) => boolean,
-        effect: (value: T) => any
-    ): Subscription {
-        // write cleanup
-        return this.data$.pipe(
-            filter(changeFn)
-        ).subscribe(value => effect(value))
-    }
-
-    // prevent memory leaks 
-    // way to register middleware - side effects -done
-    // combine few bricks
-
+// TODOs: 
+// Remove redundant methods. make it simple
     public get snapshot(): T {
         return this.subject.value.data;
+    }
+
+    public registerAction(name: string, reducer: (state: T, payload: any)=> T): void {
+        if(this.actions.has(name)){
+            throw new Error(`Action with the name "${name}" is already registered.`);
+        }
+        this.actions.set(name, reducer);
+    }
+
+    public dispatch(action: string, payload: any): void {
+        const reducer = this.actions.get(action);
+        const sideEffect = this.sideEffects.get(action);
+        if (typeof reducer === 'function') {
+            this.setData((state) => reducer(state, payload));
+        }
+        if (typeof sideEffect === 'function') {
+            sideEffect(payload);
+        }
+    }
+
+    public registerSideEffect(name: string, effect: (args: any)=>any): void {
+        if (this.sideEffects.has(name)) {
+            throw new Error(`Side effect with the name "${name}" is already registered.`);
+        }
+        this.sideEffects.set(name, effect);
     }
 }

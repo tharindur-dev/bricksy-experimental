@@ -65,13 +65,16 @@ const petstore = Brick.createBrick('first', myPet);
 const vetStore = Brick.createBrick('vets', vets);
 
 const owner$ = petstore.select$((s)=>(s.owner));
+const store$ = petstore.select$();
 
 owner$.subscribe(x=>console.log('owner',x));
+store$.subscribe(x=> console.log('store obs', x));
 
 petstore.setData({
     ...myPet,
     name: 'Max'
 });
+
 
 petstore.setData({
     ...myPet,

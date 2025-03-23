@@ -11,10 +11,6 @@ const err$ = brick.error$;
 err$.subscribe(console.log)
 count$.subscribe(console.log);
 
-brick.registerSideEffect(
-    (curr) => curr.count === 100,
-    (value) => console.log('🎉value is 100 🎉🎉🎉🎉🎉', value)
-);
 
 const countS = brick.select$((x)=> x.count );
 countS.subscribe(value=> console.log('count changed:', value));
