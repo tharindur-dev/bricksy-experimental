@@ -1,4 +1,5 @@
-import { Brick } from "../brick/Brick";
+import { createStore } from "../brick";
+
 type Pet = {
     name: string;
     age: number;
@@ -61,11 +62,15 @@ const vets: Vet[] = [
 ];
 
 
-const petstore = Brick.createBrick('first', myPet);
-const vetStore = Brick.createBrick('vets', vets);
+const petstore = createStore(myPet);
+const vetStore = createStore(vets);
 
 const owner$ = petstore.select$((s)=>(s.owner));
 const store$ = petstore.select$();
+const ownerName$ = petstore.select$(
+    (s) => s.owner.name,
+    (x,y) => x === y
+);
 
 owner$.subscribe(x=>console.log('owner',x));
 store$.subscribe(x=> console.log('store obs', x));
@@ -89,10 +94,7 @@ petstore.setData({
     }
 });
 
-petstore.patch({name: 'bunny'});
+petstore.setData((state)=>({...state, name: 'bunny'}));
 
-
-
-// selector from multiple stores
 
 

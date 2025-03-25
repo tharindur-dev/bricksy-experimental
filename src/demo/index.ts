@@ -1,14 +1,13 @@
+import { createStore } from '../brick';
 import { Brick } from '../brick/Brick';
 
 type X = {message: string, count: number};
-const brick: Brick<X> = Brick.createBrick('test', {count: 10, message: 'hello'});
-const brick2 = new Brick('test','hello');
+const brick: Brick<X> = createStore({count: 10, message: 'hello'});
+const brick2 = new Brick('hello');
 
-brick.data$.subscribe(console.log);
+brick.select$().subscribe(console.log);
 
 const count$ = brick.select$((s)=> s.count);
-const err$ = brick.error$;
-err$.subscribe(console.log)
 count$.subscribe(console.log);
 
 
@@ -25,7 +24,7 @@ setValue(brick, 10);
 
 
 function setValue(brick: Brick<X>, value: number ) {
-    brick.patch({count: value});
+    brick.setData((state)=>({...state, count: value}));
     console.log('value set:', value);
 }
 
