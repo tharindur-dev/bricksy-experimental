@@ -42,17 +42,11 @@ export class Brick<T> {
     public setData(updateFn: (current: T) => T): void;
     public setData(arg1: T | ((current: T)=> T)): void {
         if(arg1 instanceof Function) {
-            this.subject.next( {
-                ...this.subject.value,
-                data: arg1(this.subject.value)
-            });
+            this.subject.next(arg1(this.subject.value));
             return;
         }
         if(arg1 instanceof Object) {
-            this.subject.next({
-                ...this.subject.value,
-                data: arg1 as T
-            });
+            this.subject.next(arg1);
         }
 
     }
