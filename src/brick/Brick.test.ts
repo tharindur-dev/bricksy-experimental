@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Brick } from "./Brick";
+import { createStore } from ".";
 
 
 describe('Brick', () => {
@@ -14,7 +15,7 @@ describe('Selectors test', ()=> {
         it('should observe the entire state', (done) => {
             const brick = new Brick({ count: 0, name: 'Bricksy' });
             brick.select$().subscribe((state) => {
-                
+
                 assert.deepStrictEqual(state, { count: 0, name: 'Bricksy' });
                 done();
             });
@@ -29,16 +30,30 @@ describe('Selectors test', ()=> {
         });
 
         it('should observe with a custom comparator', (done) => {
-            const brick = new Brick({ count: 0, name: 'Bricksy' });
-            brick.select$(
+            const store = createStore({ count: 0, name: 'Bricksy' });
+            const data: string[] = [];
+            store.select$(
                 (s)=> s.name,
-                (prev, curr) => prev?.toLowerCase() !== curr?.toLowerCase()
+                (prev, curr) => prev.toLowerCase() === curr.toLowerCase()
             ).subscribe(
-            (name) => {
-                assert.strictEqual(name, 'Bricksy');
+                (name) => {
+                    data.push(name);
+                }
+            );
+
+            store.setData((data) => ({ ...data, count: 1 }));
+            store.setData((data) => ({ ...data, name: 'brisky' }));
+            store.setData((data) => ({ ...data, name: 'BriskY' }));
+            store.setData((data) => ({ ...data, name: 'Bricksy' }));
+
+            defer(()=> {
+                assert.deepStrictEqual(data, ['Bricksy', 'brisky', 'Bricksy']);
                 done();
-            }
-            )
+            });
         });
     });
 })
+
+function defer(fn: () => void, delay: number = 100): void {
+    setTimeout(fn, delay);
+}

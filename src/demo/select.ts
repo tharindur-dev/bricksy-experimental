@@ -94,6 +94,10 @@ petstore.setData({
     }
 });
 
+ownerName$.subscribe((name)=> console.log('owner name', name));
+
+petstore.setData((d)=> ({...d, owner: {...d.owner, name: 'paul'}}));
+
 petstore.setData((state)=>({...state, name: 'bunny'}));
 
 
