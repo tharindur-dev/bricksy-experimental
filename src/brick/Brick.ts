@@ -2,6 +2,7 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
 import { distinctUntilChanged } from "rxjs/internal/operators/distinctUntilChanged";
 import { map } from "rxjs/internal/operators/map";
 import { Observable } from "rxjs/internal/Observable";
+
 export class Brick<T> {
 
     private subject: BehaviorSubject<T>;
@@ -177,7 +178,23 @@ export class Brick<T> {
         this.sideEffects.set(name, effect);
     }
 
-    
+    /**
+     * Dispatches an action or triggers a side effect by its name.
+     *
+     * @param action - The name of the action or side effect to invoke.
+     * @param payload - The data to pass to the action reducer or side effect.
+     *
+     * @remarks
+     * - If an action is registered with the given name, its reducer updates the state.
+     * - If a side effect is registered with the given name, it is executed with the payload.
+     *
+     * @example
+     * ```typescript
+     * const brick = new Brick({ count: 0 });
+     * brick.registerAction('increment', (state, payload) => ({ count: state.count + payload }));
+     * brick.dispatch('increment', 1); // Updates state to { count: 1 }
+     * ```
+     */
     public dispatch(action: string, payload: any): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
