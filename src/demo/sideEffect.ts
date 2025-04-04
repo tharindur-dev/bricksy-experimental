@@ -1,5 +1,6 @@
 import { skip } from "rxjs";
 import { Brick } from "../brick/Brick";
+import { createStore } from "../brick";
 
 type PetAccessory = {
     id: string;
@@ -59,7 +60,7 @@ const sampleData: PetAccessoryShop = {
  *                                                     *
  *******************************************************/
 
-const store = Brick.createBrick('petstore', sampleData);
+const store = createStore(sampleData);
 const SET_LOADING = 'ACTION_SET_LOADING';
 const FETCH_DATA = 'FETCH_DATA';
 store.registerAction(SET_LOADING, (state, isLoading: boolean) => {

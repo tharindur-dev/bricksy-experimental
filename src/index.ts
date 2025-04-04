@@ -1,3 +1,3 @@
-import Brick from "./brick";
+import { createStore } from "./brick";
 
-export default Brick;
+export { createStore };
