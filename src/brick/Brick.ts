@@ -6,8 +6,8 @@ import { Observable } from "rxjs/internal/Observable";
 export class Brick<T> {
 
     private subject: BehaviorSubject<T>;
-    private actions = new Map<string, (state: T, payload: any) => T>();
-    private sideEffects = new Map<string, (args: any) => any>();
+    private actions = new Map<string, (state: T, payload: unknown) => T>();
+    private sideEffects = new Map<string, (args: unknown) => unknown>();
 
     constructor(initialData: T) {
         this.subject = new BehaviorSubject(initialData);
@@ -144,7 +144,7 @@ export class Brick<T> {
      * console.log(brick.snapshot); // { count: 1 }
      * ```
      */
-    public registerAction(name: string, reducer: (state: T, payload: any)=> T): void {
+    public registerAction(name: string, reducer: (state: T, payload: unknown)=> T): void {
         if(this.actions.has(name)){
             throw new Error(`Action with the name "${name}" is already registered.`);
         }
@@ -171,7 +171,7 @@ export class Brick<T> {
      * // Output: Side effect triggered with payload: { message: 'Hello, Bricksy!' }
      * ```
      */
-    public registerSideEffect(name: string, effect: (args: any)=>any): void {
+    public registerSideEffect(name: string, effect: (args: unknown)=> unknown): void {
         if (this.sideEffects.has(name)) {
             throw new Error(`Side effect with the name "${name}" is already registered.`);
         }
@@ -195,7 +195,7 @@ export class Brick<T> {
      * brick.dispatch('increment', 1); // Updates state to { count: 1 }
      * ```
      */
-    public dispatch(action: string, payload: any): void {
+    public dispatch(action: string, payload: unknown): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
         if (typeof reducer === 'function') {
@@ -205,4 +205,7 @@ export class Brick<T> {
             sideEffect(payload);
         }
     }
+
+
+    // TODO: Add unit tests for action / side effect / dispatch
 }
