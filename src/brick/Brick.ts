@@ -102,7 +102,7 @@ export class Brick<T> {
     public select$<S>(
         selector?: (source: T) => S,
         comparator?: (previous: S, current: S) => boolean
-      ): Observable<any> { 
+      ): Observable<S> { 
 
         if(!selector){
             return this.subject.asObservable() as unknown as Observable<S>;
@@ -144,6 +144,7 @@ export class Brick<T> {
      * console.log(brick.snapshot); // { count: 1 }
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public registerAction(name: string, reducer: (state: T, payload: any)=> T): void {
         if(this.actions.has(name)){
             throw new Error(`Action with the name "${name}" is already registered.`);
@@ -171,6 +172,7 @@ export class Brick<T> {
      * // Output: Side effect triggered with payload: { message: 'Hello, Bricksy!' }
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public registerSideEffect(name: string, effect: (args: any)=> void): void {
         if (this.sideEffects.has(name)) {
             throw new Error(`Side effect with the name "${name}" is already registered.`);
@@ -195,6 +197,7 @@ export class Brick<T> {
      * brick.dispatch('increment', 1); // Updates state to { count: 1 }
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public dispatch(action: string, payload: any): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
