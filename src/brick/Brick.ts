@@ -206,6 +206,4 @@ export class Brick<T> {
         }
     }
 
-
-    // TODO: Add unit tests for action / side effect / dispatch
 }
