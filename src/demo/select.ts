@@ -25,45 +25,9 @@ const myPet: Pet = {
         }
     }
 };
-type Vet = {
-    name: string;
-    specialization: string;
-    contact: {
-        email: string;
-        phone: string;
-    };
-};
-
-const vets: Vet[] = [
-    {
-        name: 'Dr. Smith',
-        specialization: 'Canine Specialist',
-        contact: {
-            email: 'dr.smith@example.com',
-            phone: '111-222-3333'
-        }
-    },
-    {
-        name: 'Dr. Brown',
-        specialization: 'Feline Specialist',
-        contact: {
-            email: 'dr.brown@example.com',
-            phone: '444-555-6666'
-        }
-    },
-    {
-        name: 'Dr. Green',
-        specialization: 'Avian Specialist',
-        contact: {
-            email: 'dr.green@example.com',
-            phone: '777-888-9999'
-        }
-    }
-];
-
 
 const petstore = createStore(myPet);
-const vetStore = createStore(vets);
+
 
 const owner$ = petstore.select$((s)=>(s.owner));
 const store$ = petstore.select$();

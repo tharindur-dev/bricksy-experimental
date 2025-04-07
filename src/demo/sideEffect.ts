@@ -1,5 +1,4 @@
 import { skip } from "rxjs";
-import { Brick } from "../brick/Brick";
 import { createStore } from "../brick";
 
 type PetAccessory = {
@@ -81,7 +80,7 @@ function mockDataFetch(id: number){
     return new Promise<void>((resolve) => {
 
         setTimeout(() => {
-            console.log('Data fetched successfully');
+            console.log('Data fetched successfully for', id);
             resolve();
         }, 3000);
     });

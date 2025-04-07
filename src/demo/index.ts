@@ -3,7 +3,6 @@ import { Brick } from '../brick/Brick';
 
 type X = {message: string, count: number};
 const brick: Brick<X> = createStore({count: 10, message: 'hello'});
-const brick2 = new Brick('hello');
 
 brick.select$().subscribe(console.log);
 
