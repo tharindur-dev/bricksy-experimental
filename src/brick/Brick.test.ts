@@ -57,7 +57,7 @@ describe('Selectors test', () => {
 describe('Actions test', () => {
     it('should register an action and update state when dispatched', () => {
         const brick = createStore({ count: 0 });
-        brick.registerAction('increment', (state, payload) => ({
+        brick.registerAction('increment', (state, payload: number) => ({
             ...state,
             count: state.count + payload
         }));
@@ -69,13 +69,13 @@ describe('Actions test', () => {
 
     it('should throw an error when registering an action with a duplicate name', () => {
         const brick = createStore({ count: 0 });
-        brick.registerAction('increment', (state, payload) => ({
+        brick.registerAction('increment', (state, payload: number) => ({
             ...state,
             count: state.count + payload
         }));
 
         assert.throws(() => {
-            brick.registerAction('increment', (state, payload) => ({
+            brick.registerAction('increment', (state, payload: number) => ({
                 ...state,
                 count: state.count + payload
             }));
@@ -84,11 +84,11 @@ describe('Actions test', () => {
 
     it('should handle multiple actions and update state accordingly', () => {
         const brick = createStore({ count: 0 });
-        brick.registerAction('increment', (state, payload) => ({
+        brick.registerAction('increment', (state, payload: number) => ({
             ...state,
             count: state.count + payload
         }));
-        brick.registerAction('decrement', (state, payload) => ({
+        brick.registerAction('decrement', (state, payload: number) => ({
             ...state,
             count: state.count - payload
         }));

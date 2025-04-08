@@ -74,7 +74,6 @@ export class Brick<T> {
      *
      * @typeParam P - The type of the payload the reducer accepts.
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public registerAction<P>(name: string, reducer: (state: T, payload: P)=> T): void {
         if(this.actions.has(name)){
             throw new Error(`Action with the name "${name}" is already registered.`);
@@ -92,7 +91,7 @@ export class Brick<T> {
      *
      * @throws An error if a side effect with the same name is already registered.
      */
-    public registerSideEffect<P>(name: string, effect: (args: P) => void): void {
+    public registerSideEffect<P>(name: string, effect: (payload: P) => void): void {
         if (this.sideEffects.has(name)) {
             throw new Error(`Side effect with the name "${name}" is already registered.`);
         }
@@ -106,7 +105,6 @@ export class Brick<T> {
      * - Executes the reducer to update the state if an action is registered.
      * - Executes the side effect if one is registered with the same name.
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public dispatch(action: string, payload: any): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
