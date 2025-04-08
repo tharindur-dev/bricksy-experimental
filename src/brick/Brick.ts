@@ -20,24 +20,7 @@ export class Brick<T> {
     /**
      * Updates the state of the Brick with new data or a transformation function.
      *
-     * @param arg1 - Either a new state object of type `T` or a function that takes the current state
-     *               and returns a new state.
-     *
-     * @remarks
-     * - If `arg1` is a function, it will be called with the current state, and its return value
-     *   will be used as the new state.
-     * - If `arg1` is an object, it will directly replace the current state.
-     *
-     * @example
-     * ```typescript
-     * const brick = new Brick({ count: 0 });
-     *
-     * // Update state with a new object
-     * brick.setData({ count: 5 });
-     *
-     * // Update state using a transformation function
-     * brick.setData((current) => ({ count: current.count + 1 }));
-     * ```
+     * @param arg1 - Either a new state object or a function to transform the current state.
      */
     public setData(data: T): void;
     public setData(updateFn: (current: T) => T): void;
@@ -57,41 +40,9 @@ export class Brick<T> {
     }
 
     /**
-     * Selects and observes a portion of the state or the entire state of the Brick.
+     * Selects a portion of the state or the entire state as an observable.
      *
      * @typeParam S - The type of the selected state if a selector is provided.
-     *
-     * @param selector - An optional function to extract a specific portion of the state.
-     *                   If not provided, the entire state is observed.
-     * @param comparator - An optional function to determine if the selected state has changed.
-     *                     If not provided, strict equality comparison is used.
-     *
-     * @returns An `Observable` that emits the selected state or the entire state.
-     *
-     * @remarks
-     * - If no selector is provided, the entire state is emitted as an observable.
-     * - If a selector is provided, it extracts a specific portion of the state.
-     * - The comparator function can be used to customize the change detection logic.
-     *
-     * @example
-     * ```typescript
-     * const brick = new Brick({ count: 0, name: 'Bricksy' });
-     *
-     * // Observe the entire state
-     * brick.select$().subscribe(state => {
-     *   console.log(state); // { count: 0, name: 'Bricksy' }
-     * });
-     *
-     * // Observe a specific portion of the state
-     * brick.select$(state => state.count).subscribe(count => {
-     *   console.log(count); // 0
-     * });
-     *
-     * // Observe with a custom comparator
-     * brick.select$(state => state.name, (prev,curr) => prev.name?.equalsIgnoreCase(curr.name)).subscribe(name => {
-     *   console.log(name); // 'Bricksy'
-     * });
-     * ```
      */
     public select$(): Observable<T>;
     public select$<S>(selector: (source: T) => S): Observable<S>;
@@ -114,42 +65,21 @@ export class Brick<T> {
         );
     }
 
-    /**
-     * @returns The current state of the store.
-     * 
-     */
-
     public get snapshot(): T {
         return this.subject.value;
     }
 
     /**
-     * Registers a new action with a reducer function.
+     * Registers an action with a reducer to update the state.
      *
-     * @param name - The name of the action to register.
-     * @param reducer - A function that takes the current state and a payload, and returns the new state.
-     *
-     * @throws An error if an action with the same name is already registered.
-     *
-     * @example
-     * ```typescript
-     * const brick = new Brick({ count: 0 });
-     *
-     * brick.registerAction('increment', (state, payload) => ({
-     *   ...state,
-     *   count: state.count + payload
-     * }));
-     *
-     * brick.dispatch('increment', 1);
-     * console.log(brick.snapshot); // { count: 1 }
-     * ```
+     * @typeParam P - The type of the payload the reducer accepts.
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public registerAction(name: string, reducer: (state: T, payload: any)=> T): void {
+    public registerAction<P>(name: string, reducer: (state: T, payload: P)=> T): void {
         if(this.actions.has(name)){
             throw new Error(`Action with the name "${name}" is already registered.`);
         }
-        this.actions.set(name, reducer);
+        this.actions.set(name, (state, payload) => reducer(state, payload as P));
     }
 
     /**
@@ -158,44 +88,23 @@ export class Brick<T> {
      * @param name - The name of the side effect to register.
      * @param effect - A function that performs a side effect when the associated action is dispatched.
      *
+     * @typeParam P - The type of the payload that the side effect function accepts.
+     *
      * @throws An error if a side effect with the same name is already registered.
-     *
-     * @example
-     * ```typescript
-     * const brick = new Brick({ count: 0 });
-     *
-     * brick.registerSideEffect('log', (payload) => {
-     *   console.log('Side effect triggered with payload:', payload);
-     * });
-     *
-     * brick.dispatch('log', { message: 'Hello, Bricksy!' });
-     * // Output: Side effect triggered with payload: { message: 'Hello, Bricksy!' }
-     * ```
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public registerSideEffect(name: string, effect: (args: any)=> void): void {
+    public registerSideEffect<P>(name: string, effect: (args: P) => void): void {
         if (this.sideEffects.has(name)) {
             throw new Error(`Side effect with the name "${name}" is already registered.`);
         }
-        this.sideEffects.set(name, effect);
+        this.sideEffects.set(name, (payload) => effect(payload as P));
     }
 
     /**
      * Dispatches an action or triggers a side effect by its name.
      *
-     * @param action - The name of the action or side effect to invoke.
-     * @param payload - The data to pass to the action reducer or side effect.
-     *
      * @remarks
-     * - If an action is registered with the given name, its reducer updates the state.
-     * - If a side effect is registered with the given name, it is executed with the payload.
-     *
-     * @example
-     * ```typescript
-     * const brick = new Brick({ count: 0 });
-     * brick.registerAction('increment', (state, payload) => ({ count: state.count + payload }));
-     * brick.dispatch('increment', 1); // Updates state to { count: 1 }
-     * ```
+     * - Executes the reducer to update the state if an action is registered.
+     * - Executes the side effect if one is registered with the same name.
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public dispatch(action: string, payload: any): void {
