@@ -2,15 +2,19 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
 import { distinctUntilChanged } from "rxjs/internal/operators/distinctUntilChanged";
 import { map } from "rxjs/internal/operators/map";
 import { Observable } from "rxjs/internal/Observable";
+import { SetDataArg } from "./types";
+import { DevtoolWrapper } from "./devtoolWrapper";
 
 export class Brick<T> {
 
     private subject: BehaviorSubject<T>;
     private actions = new Map<string, (state: T, payload: unknown) => T>();
     private sideEffects = new Map<string, (args: unknown) => unknown>();
-
+    private devtoolWrapper: DevtoolWrapper<T>;
+    
     constructor(initialData: T) {
         this.subject = new BehaviorSubject(initialData);
+        this.devtoolWrapper = DevtoolWrapper.initDevtools(initialData);
     }
 
     public static createBrick<T>(initialData: T): Brick<T> {
@@ -22,15 +26,18 @@ export class Brick<T> {
      *
      * @param arg1 - Either a new state object or a function to transform the current state.
      */
-    public setData(data: T): void;
-    public setData(updateFn: (current: T) => T): void;
-    public setData(arg1: T | ((current: T)=> T)): void {
-        if(arg1 instanceof Function) {
-            this.subject.next(arg1(this.subject.value));
+    public setData(setDataArg: SetDataArg<T>): void;
+    public setData(setDataArg: SetDataArg<T>, action: string): void;
+    public setData(setDataArg: SetDataArg<T>, action: string = 'SET_DATA'): void {
+        if(setDataArg instanceof Function) {
+            const newState = setDataArg(this.subject.value);
+            this.subject.next(newState);
+            this.devtoolWrapper?.send(action, newState);
             return;
         }
-        if(arg1 instanceof Object) {
-            this.subject.next(arg1);
+        if(setDataArg instanceof Object) {
+            this.devtoolWrapper?.send(action, setDataArg);
+            this.subject.next(setDataArg);
         }
 
     }
@@ -105,14 +112,16 @@ export class Brick<T> {
      * - Executes the reducer to update the state if an action is registered.
      * - Executes the side effect if one is registered with the same name.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public dispatch(action: string, payload: any): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
         if (typeof reducer === 'function') {
-            this.setData((state) => reducer(state, payload));
+            this.setData((state) => reducer(state, payload), action);
         }
         if (typeof sideEffect === 'function') {
             sideEffect(payload);
+            this.devtoolWrapper?.send(action, {type: 'sideEffect', payload});
         }
     }
 
