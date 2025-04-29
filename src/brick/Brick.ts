@@ -24,7 +24,7 @@ export class Brick<T> {
     /**
      * Updates the state of the Brick with new data or a transformation function.
      *
-     * @param arg1 - Either a new state object or a function to transform the current state.
+     * @param setDataArg - Either a new state object or a function to transform the current state.
      */
     public setData(setDataArg: SetDataArg<T>): void;
     public setData(setDataArg: SetDataArg<T>, action: string): void;
@@ -112,8 +112,7 @@ export class Brick<T> {
      * - Executes the reducer to update the state if an action is registered.
      * - Executes the side effect if one is registered with the same name.
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public dispatch(action: string, payload: any): void {
+    public dispatch(action: string, payload: unknown): void {
         const reducer = this.actions.get(action);
         const sideEffect = this.sideEffects.get(action);
         if (typeof reducer === 'function') {
