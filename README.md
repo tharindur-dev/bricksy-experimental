@@ -20,7 +20,7 @@ Bricksy is a light weight zero boilerplate state management library built on top
 - ⚡ **Reactive by Design**: Built on top of RxJs, enabling powerful reactive programming capabilities.
 - 📦 **Lightweight**: Small footprint, perfect for projects that don't require heavy state management libraries.
 - 🌟 **TypeScript Support**: Fully typed for a better developer experience.
-- 🌐 **Framework Agnostic**: Works with any JavaScript or TypeScript framework.
+- 🛠️ **Redux DevTools Integration**: Seamlessly integrates with Redux DevTools for state debugging.
 
 <!-- Installation -->
 <!-- Provide installation instructions. -->
@@ -65,13 +65,13 @@ console.log(store.snapshot()); // { count: 6 }
 ```
 
 
-#### 3. `select()`
-The `select()` function enables you to extract observable "slices" of the state.
+#### 3. `select$()`
+The `select$()` function enables you to extract observable "slices" of the state.
 
 Selecting the entire state
 
 ```typescript
-store.select().subscribe((state) => {
+store.select$().subscribe((state) => {
     console.log('State updated:', state);
 });
 ```
@@ -91,13 +91,13 @@ const store = createStore({
 });
 
 
-store.select((state)=> state.user).subscribe((user) => {
+store.select$((state)=> state.user).subscribe((user) => {
     console.log('User updated:', user);
 });
 
 ```
 
-You can also declare a comparison function with select() so that events are emitted only when the comparison function returns true.
+You can also declare a comparison function with select$() so that events are emitted only when the comparison function returns true.
 
 ```typescript
 const store = createStore({
@@ -113,7 +113,7 @@ const store = createStore({
 });
 
 
-store.select(
+store.select$(
     (state)=> state.user, 
     (prevUser, currentUser)=> prevUser.id !== currentUser.id
     ).subscribe((user) => {
