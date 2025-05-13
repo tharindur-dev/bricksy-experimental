@@ -1,4 +1,4 @@
-import { DevtoolWrapper } from "./devtoolWrapper";
+import { DevtoolWrapper } from "../brick/devtoolWrapper";
 
 /**
  * @jest-environment jsdom

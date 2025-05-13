@@ -1,4 +1,4 @@
-import { createStore } from "../brick";
+import { createStore } from "../src";
 
 type Pet = {
     name: string;
