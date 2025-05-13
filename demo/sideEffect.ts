@@ -1,5 +1,5 @@
 import { skip } from "rxjs";
-import { createStore } from "../brick";
+import { createStore } from '../src/';
 
 type PetAccessory = {
     id: string;

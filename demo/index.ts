@@ -1,5 +1,5 @@
-import { createStore } from '../brick';
-import { Brick } from '../brick/Brick';
+import { createStore } from '../src';
+import { Brick } from '../src/brick/Brick';
 
 type X = {message: string, count: number};
 const brick: Brick<X> = createStore({count: 10, message: 'hello'});

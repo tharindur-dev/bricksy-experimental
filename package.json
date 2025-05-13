@@ -11,7 +11,9 @@
     "pack": "npm pack"
   },
   "files": [
-    "dist"
+    "dist/",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [],
   "author": "TJ-513",
