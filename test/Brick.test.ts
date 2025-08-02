@@ -1,6 +1,7 @@
 import assert from "assert";
-import { Brick } from "../brick/Brick";
-import { createStore } from "../brick";
+// import { Brick } from "../brick/Brick";
+import { Brick } from "../src/brick"; // Adjusted import to the actual file
+import { createStore } from "../src"; // Adjusted import to the actual file
 
 
 describe('Brick', () => {
