@@ -1,5 +1,5 @@
 {
-  "name": "bricksy",
+  "name": "bricksy-rx",
   "version": "0.1.0",
   "description": "A lightweight, reactive state management library for TypeScript applications.",
   "main": "dist/index.js",
@@ -7,8 +7,8 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "publish": "npm publish",
-    "pack": "npm pack"
+    "pack": "npm pack",
+    "test": "jest"
   },
   "files": [
     "dist/",
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tharindur-dev/bricksy-experimental"
+    "url": "git+https://github.com/tharindur-dev/bricksy-experimental.git"
   },
   "bugs": {
     "url": "https://github.com/tharindur-dev/bricksy-experimental/issues"
