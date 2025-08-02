@@ -1,7 +1,7 @@
 {
   "name": "bricksy",
-  "version": "1.0.0",
-  "description": "A TypeScript package for bricksy functionality.",
+  "version": "0.1.0",
+  "description": "A lightweight, reactive state management library for TypeScript applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -15,8 +15,14 @@
     "README.md",
     "LICENSE"
   ],
-  "keywords": [],
-  "author": "TJ-513",
+  "keywords": [
+    "state-management",
+    "reactive",
+    "typescript",
+    "store",
+    "observable"
+  ],
+  "author": "Tharindu Ranaweera",
   "license": "MIT",
   "dependencies": {
     "rxjs": "^7.8.2"
@@ -33,5 +39,13 @@
     "ts-jest": "^29.2.6",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.29.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tharindur-dev/bricksy-experimental"
+  },
+  "bugs": {
+    "url": "https://github.com/tharindur-dev/bricksy-experimental/issues"
+  },
+  "homepage": "https://github.com/tharindur-dev/bricksy-experimental#readme"
 }
