@@ -1,19 +1,11 @@
-
-
 # Bricksy: A zero boilerplate solution to state management
 
-<!-- Introduction -->
-<!-- Add a brief introduction to the library and its purpose. -->
-Bricksy is a light weight zero boilerplate state management library built on top of RxJs.
-
+Bricksy is a lightweight, zero boilerplate reactive state management library for TypeScript applications, built on top of RxJs.
 
 ## When to use Bricksy
 - Your app needs state management, you don't need to go for a full blown state management library like NgRx or Redux.
-
 - You need a lightweight state management libary.
 
-<!-- Features -->
-<!-- List the key features of Bricksy. -->
 ## Features
 
 - 🚀 **Zero Boilerplate**: Simplify state management with minimal setup and configuration.
@@ -22,8 +14,6 @@ Bricksy is a light weight zero boilerplate state management library built on top
 - 🌟 **TypeScript Support**: Fully typed for a better developer experience.
 - 🛠️ **Redux DevTools Integration**: Seamlessly integrates with Redux DevTools for state debugging.
 
-<!-- Installation -->
-<!-- Provide installation instructions. -->
 ## Installation
 
 To install Bricksy, you can use npm or yarn:
@@ -64,14 +54,13 @@ store.setData(state => ({count: state.count + 1}));
 console.log(store.snapshot()); // { count: 6 }
 ```
 
-
 #### 3. `select$()`
 The `select$()` function enables you to extract observable "slices" of the state.
 
 Selecting the entire state
 
 ```typescript
-store.select$().subscribe((state) => {
+const store$ = store.select$().subscribe((state) => {
     console.log('State updated:', state);
 });
 ```
@@ -90,11 +79,9 @@ const store = createStore({
     },
 });
 
-
-store.select$((state)=> state.user).subscribe((user) => {
+const user$ = store.select$((state)=> state.user).subscribe((user) => {
     console.log('User updated:', user);
 });
-
 ```
 
 You can also declare a comparison function with select$() so that events are emitted only when the comparison function returns true.
@@ -112,8 +99,7 @@ const store = createStore({
     },
 });
 
-
-store.select$(
+const user$ = store.select$(
     (state)=> state.user, 
     (prevUser, currentUser)=> prevUser.id !== currentUser.id
     ).subscribe((user) => {
@@ -125,18 +111,22 @@ store.setData((state) => ({...state, user: {...state.user, name: 'Jane Doe'}}));
 
 // this will emit an event since the id has been changed
 store.setData((state) => ({...state, user: {...state.user, id: 2, name: 'Jane Doe'}}));
-
 ```
+
 #### 4. `registerAction()` 
 The `registerAction()` method lets you define actions that can modify the state.
 
 ```typescript
+const store = createStore({ count: 5 });
+
 store.registerAction('increment', (state, payload) => {
-    return { ...state, count: state.count + payload };
+    return { ...state, count: state.count + payload.add };
 });
 
-store.dispatch('increment', 1);
-console.log(store.getData()); // { count: 6 }
+const payload = { add: 2 };
+
+store.dispatch('increment', payload);
+console.log(store.getData()); // { count: 7 }
 ```
 
 #### 5. `registerSideEffect()`
@@ -153,11 +143,6 @@ store.setData({ count: 10 });
 
 With these methods, Bricksy provides a simple yet powerful way to manage application state reactively.
 
-<!-- API Reference -->
-<!-- Document the main API methods and their usage. -->
+## License
 
-<!-- Contributing -->
-<!-- Explain how others can contribute to the project. -->
-
-<!-- License -->
-<!-- Specify the license under which the library is distributed. -->
+MIT © Tharindu Ranaweera
