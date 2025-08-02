@@ -3,7 +3,7 @@
 Bricksy is a lightweight, zero boilerplate reactive state management library for TypeScript applications, built on top of RxJs.
 
 ## When to use Bricksy
-- Your app needs state management, you don't need to go for a full blown state management library like NgRx or Redux.
+- Your app needs state management, but you don't need to go for a full blown state management library like NgRx or Redux.
 - You need a lightweight state management libary.
 
 ## Features
@@ -20,10 +20,10 @@ To install Bricksy, you can use npm or yarn:
 
 ```bash
 # Using npm
-npm install bricksy
+npm install bricksy-rx
 
 # Using yarn
-yarn add bricksy
+yarn add bricksy-rx
 ```
 
 ## Usage
